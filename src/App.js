@@ -27,8 +27,10 @@ function App() {
   };
 
   return (
+    
     <DndProvider backend={HTML5Backend}>
       <div className="App">
+
         <h1>تحميل الملفات</h1>
         <form onSubmit={(e) => e.preventDefault()}>
           <label htmlFor="paragraph-field">فقرة:</label>
@@ -41,27 +43,36 @@ function App() {
           <input
             type="text"
             id="card-input"
-            onKeyPress={(event) => {
+            onKeyDown={(event) => {
               if (event.key === "Enter") {
                 handleCardInputChange(event);
               }
             }}
           />
           <Tree
-            data={cards}
-            renderItem={(item, index) => (
-              <div key={index} className="card">
-                {item}
+            rootId={0}
+            tree ={cards}
+            render={(node, { depth, isOpen, onToggle }) => (
+              <div style={{ marginLeft: depth * 10 }}>
+                {node.droppable && (
+                  <span onClick={onToggle}>{isOpen ? "[-]" : "[+]"}</span>
+                )}
+                {node.text}
               </div>
             )}
+                      dragPreviewRender={(monitorProps) => (
+                        <div>{monitorProps.item.text}</div>
+                      )}
+
             onDrop={handleDrop}
+
           />
           <div className="drop-area">
             <p>اسحب وأسقط الملفات هنا</p>
             <input type="file" multiple />
           </div>
           <button className="upload-btn" type="submit">
-            تحميل
+            رفع
           </button>
         </form>
       </div>
