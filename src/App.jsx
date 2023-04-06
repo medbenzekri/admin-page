@@ -30,7 +30,9 @@ function App() {
         droppable: true,
         text: cardText 
        };
-      setCards([...cards, newCard])
+       
+      cards = [...cards, newCard];
+      setCards(cards);
       event.target.value = "";
     }
   };
