@@ -1,34 +1,53 @@
 import React, { useState } from "react";
-import {Tree} from "@minoru/react-dnd-treeview";
+import {
+  Tree,
+  MultiBackend,
+  getBackendOptions
+} from "@minoru/react-dnd-treeview";
 import { DndProvider } from "react-dnd";
-import { HTML5Backend } from "react-dnd-html5-backend";
 import './App.css';
+
+const PvRender = (monitorProps) => { return <div>{monitorProps.item.text}</div> }; 
+// const CustomLi= (id) => { return <li key={id}></li> };  
 function App() {
   const [paragraph, setParagraph] = useState('');
-  const [cards, setCards] = useState([]);
+  let [cards, setCards] = useState([]); 
+  let cardId = 5;
 
   const handleParagraphChange = (event) => {
     setParagraph(event.target.value);
   };
 
   const handleCardInputChange = (event) => {
-    const cardText = event.target.value;
-    if (cardText.trim() !== "") {
-      setCards([...cards, cardText]);
+
+    const cardText = event.target.value.trim();
+    if (cardText !== "") {
+      cardId++;
+      console.log(cardId);    
+      const newCard = 
+      { id: cardId,
+        parent: 0,
+        droppable: true,
+        text: cardText 
+       };
+      setCards([...cards, newCard])
       event.target.value = "";
     }
   };
 
-  const handleDrop = (sourceIndex, destIndex, droppedItem) => {
-    const updatedCards = [...cards];
-    updatedCards.splice(sourceIndex, 1);
-    updatedCards.splice(destIndex, 0, droppedItem);
-    setCards(updatedCards);
-  };
+  // const handleDrop = (sourceIndex, destIndex, droppedItem) => {
+  //   const updatedCards = [...cards];
+  //   updatedCards.splice(sourceIndex, 1);
+  //   updatedCards.splice(destIndex, 0, droppedItem);
+  //   setCards(updatedCards);
+  // };
+  
+
+  const handleDrop = (newTreeData) => setCards(newTreeData);
 
   return (
     
-    <DndProvider backend={HTML5Backend}>
+    <DndProvider backend={MultiBackend} options={getBackendOptions()}>
       <div className="App">
 
         <h1>تحميل الملفات</h1>
@@ -50,21 +69,19 @@ function App() {
             }}
           />
           <Tree
+            tree={cards}
             rootId={0}
-            tree ={cards}
+            onDrop={handleDrop}
             render={(node, { depth, isOpen, onToggle }) => (
-              <div style={{ marginLeft: depth * 10 }}>
+               <div key={node.id} style={{ marginLeft: depth * 10 }}>
                 {node.droppable && (
-                  <span onClick={onToggle}>{isOpen ? "[-]" : "[+]"}</span>
+                  <span key={node.id} onClick={onToggle}>{isOpen ? "-" : "+"}</span>
                 )}
+
                 {node.text}
               </div>
-            )}
-                      dragPreviewRender={(monitorProps) => (
-                        <div>{monitorProps.item.text}</div>
-                      )}
-
-            onDrop={handleDrop}
+             )}
+            dragPreviewRender={PvRender}
 
           />
           <div className="drop-area">
